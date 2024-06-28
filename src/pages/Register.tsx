@@ -5,6 +5,11 @@ import InputErrorMessage from "../components/ui/InputErrorMessage";
 import { REGISTER_FORM } from "../data";
 import { schemaRegister } from "../validation";
 import { yupResolver } from "@hookform/resolvers/yup";
+import axiosInstance from "../config/axios.config";
+import toast from "react-hot-toast";
+import { useState } from "react";
+import { AxiosError } from "axios";
+import { IErrorHandler } from "../interfaces";
 
 interface IFormInput {
   username: string;
@@ -12,14 +17,49 @@ interface IFormInput {
   password: string;
 }
 const RegisterPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormInput>({ resolver: yupResolver(schemaRegister) });
   //** Handler
-  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
-  console.log(errors);
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    setIsLoading(true);
+    /**
+     * * 1 - pending
+     */
+
+    try {
+      // ** 2 - fulfilled => SUCCESS => (OPTIONAL)
+      const { status } = await axiosInstance.post("/auth/local/register", data);
+      if (status === 200) {
+        toast.success("You Will Navigate To Login Page In 4 Seconds 🎉🎉🎉", {
+          position: "top-right",
+          duration: 4000,
+          style: {
+            backgroundColor: "#1b167a",
+            color: "white",
+            width: "fit-content",
+          },
+        });
+      }
+    } catch (error) {
+      // ** 3 - Rejected => FAILED => (OPTIONAL)
+      const errorObj = error as AxiosError<IErrorHandler>;
+      toast.error(`${errorObj.response?.data.error.message} ❌`, {
+        position: "top-right",
+        duration: 4000,
+        style: {
+          backgroundColor: "#1b167a",
+          color: "white",
+          width: "fit-content",
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   //** Rendering
   const registerFormInput = REGISTER_FORM.map(
     ({ name, placeholder, type, validation }, idx) => (
@@ -40,7 +80,9 @@ const RegisterPage = () => {
       </h2>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {registerFormInput}
-        <Button fullWidth>Register</Button>
+        <Button fullWidth isLoading={isLoading}>
+          Register
+        </Button>
       </form>
     </div>
   );

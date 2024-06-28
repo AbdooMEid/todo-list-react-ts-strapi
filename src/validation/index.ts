@@ -5,7 +5,7 @@ export const schemaRegister = yup
     username: yup
       .string()
       .required("UserName Is Required!")
-      .min(5, "Must be at least 5 characters"),
+      .min(4, "Must be at least 4 characters"),
     email: yup
       .string()
       .email("Must be a valid email")
