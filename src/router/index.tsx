@@ -11,6 +11,7 @@ import HomePage from "../pages";
 // import LoginPage from "../pages/Login";
 import RegisterPage from "../pages/Register";
 import TodosPage from "../pages/Todos";
+import LoginPage from "../pages/Login";
 
 const storageKey = "loggedInUser";
 const userDataString = localStorage.getItem(storageKey);
@@ -57,7 +58,7 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           }
         />
-        {/* <Route
+        <Route
           path="login"
           element={
             <ProtectedRoute
@@ -68,7 +69,7 @@ const router = createBrowserRouter(
               <LoginPage />
             </ProtectedRoute>
           }
-        /> */}
+        />
         <Route
           path="register"
           element={

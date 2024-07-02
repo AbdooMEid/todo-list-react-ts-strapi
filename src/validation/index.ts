@@ -17,7 +17,23 @@ export const schemaRegister = yup
     password: yup
       .string()
       .required("Password Is Required!")
-      .min(6, "Must be at least 6 characters")
-      .max(20, "Must be at most 20 characters"),
+      .min(6, "Must be at least 6 characters"),
+  })
+  .required();
+
+export const schemaLogin = yup
+  .object({
+    identifier: yup
+      .string()
+      .email("Must be a valid email")
+      .required("Email Is Required!")
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Must be a valid email"
+      ),
+    password: yup
+      .string()
+      .required("Password Is Required!")
+      .min(6, "Must be at least 6 characters"),
   })
   .required();
