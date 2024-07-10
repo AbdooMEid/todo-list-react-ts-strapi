@@ -12,6 +12,7 @@ const TodoList = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isToggleEditTodo, setIsToggleEditTodo] = useState(false);
   const [isToggleRemoveTodo, setIsToggleRemoveTodo] = useState(false);
+  // const [isCounter, setIsCounter] = useState(0);
   const [todoEdit, setTodoEdit] = useState<ITodo>({
     id: 0,
     title: "",
@@ -36,9 +37,16 @@ const TodoList = () => {
     setTodoEdit(todo);
     setIsToggleEditTodo(true);
   };
-  
-  const onCloseRemoveTodo = () => setIsToggleRemoveTodo(false);
-  const onOpenRemoveTodo = () => setIsToggleRemoveTodo(true);
+
+  const onCloseRemoveTodo = () => {
+    setTodoEdit({ id: 0, title: "", description: "" });
+    setIsToggleRemoveTodo(false);
+  };
+  const onOpenRemoveTodo = (todo: ITodo) => {
+    setTodoEdit(todo);
+
+    setIsToggleRemoveTodo(true);
+  };
   const onChangeHandler = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -73,6 +81,27 @@ const TodoList = () => {
     }
   };
 
+  const removeHandler = async () => {
+    setIsUpdating(true);
+    try {
+      const { status } = await axiosInstance.delete(`/todos/${todoEdit.id}`, {
+        headers: { Authorization: `Bearer ${userData.jwt}` },
+      });
+      if (status === 200) {
+        onCloseRemoveTodo();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // ** counter ID
+  // const counter = () => {
+  //   setIsCounter(isCounter + 1);
+  // };
+
   if (isPending) return <h3>Loading...</h3>;
 
   return (
@@ -84,7 +113,9 @@ const TodoList = () => {
             key={todo.id}
             className="flex items-center justify-between hover:bg-gray-100 duration-300 p-3 rounded-md even:bg-gray-100"
           >
-            <p className="w-full font-semibold">1 - {todo.title}</p>
+            <p className="w-full font-semibold">
+              {todo.id} - {todo.title}
+            </p>
             <div className="flex items-center justify-end w-full space-x-3">
               <Button
                 variant={"default"}
@@ -93,7 +124,11 @@ const TodoList = () => {
               >
                 Edit
               </Button>
-              <Button variant={"danger"} size={"sm"} onClick={onOpenRemoveTodo}>
+              <Button
+                variant={"danger"}
+                size={"sm"}
+                onClick={() => onOpenRemoveTodo(todo)}
+              >
                 Remove
               </Button>
             </div>
@@ -141,7 +176,7 @@ const TodoList = () => {
         closeModal={onCloseRemoveTodo}
       >
         <div className="flex items-center justify-between space-x-2">
-          <Button variant={"danger"} fullWidth>
+          <Button variant={"danger"} fullWidth onClick={removeHandler}>
             Yes, Remove
           </Button>
           <Button variant={"cancel"} fullWidth onClick={onCloseRemoveTodo}>
