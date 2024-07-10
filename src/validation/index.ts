@@ -37,3 +37,13 @@ export const schemaLogin = yup
       .min(6, "Must be at least 6 characters"),
   })
   .required();
+
+export const todoSchema = yup
+  .object({
+    title: yup
+      .string()
+      .required("Title Is Required")
+      .min(10, "Title must be at least 10 characters"),
+    description: yup.string().required("Description Is Required"),
+  })
+  .required();
